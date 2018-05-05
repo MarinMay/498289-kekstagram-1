@@ -453,6 +453,7 @@ main {
 
 .img-upload__message--error {
   padding-top: 275px;
+  z-index: 10;
 
   font-family: "Open Sans", "Arial", sans-serif;
   font-weight: 400;
@@ -522,6 +523,7 @@ main {
   position: absolute;
   top: 0;
   left: 50%;
+  z-index: 100;
 
   font-family: "Open Sans", "Arial", sans-serif;
   font-weight: 400;
@@ -1208,6 +1210,32 @@ main {
   background-position: 0 -105px;
 }
 
+.error-message {
+  position: fixed;
+  z-index: 100;
+  width: 30vw;
+  left: 50%;
+  top: 17vw;
+  text-align: center;
+  background-color: #fff;
+  color: #ff0304;
+  padding: 40px;
+  font-size: 30px;
+  border-radius: 5px;
+  box-shadow: 0 0 100px #ff0304;
+  transform: translate(-50%, -50%);
+}
+
+.error-message button {
+  width: 200px;
+  margin: 20px auto 0;
+  padding: 15px;
+  color: #fff;
+  background-color: #098499;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
 
 @media (min-width: 1024px) and (max-width: 1359px) {
   .container {
