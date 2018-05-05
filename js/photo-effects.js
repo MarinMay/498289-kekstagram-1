@@ -1,5 +1,8 @@
 'use strict';
 (function () {
+  var MIN_COORDS_X = 0;
+  var MAX_COORDS_X = 100;
+  var MAX_PERCENT = 100;
   var effectsTogglers = document.querySelectorAll('.effects__label');
   var previewPhoto = document.querySelector('.img-upload__preview');
   var inputEffectLevel = document.querySelector('[name="effect-level"]');
@@ -9,10 +12,14 @@
   var levelScaleEffect = document.querySelector('.scale__level');
   var currentEffect = 'effect-none';
   var maxWidthEffectLine;
-  var defaultInputValue = 70;
-  var MIN_COORDS_X = 0;
-  var MAX_COORDS_X = 100;
-  var MAX_PERCENT = 100;
+  var defaultInputEffectValue = 100;
+  var resizeStep = 25;
+  var MIN_RESIZE_VALUE = 25;
+  var MAX_RESIZE_VALUE = 100;
+  var inputResize = document.querySelector('.resize__control--value');
+  var resizeControlMinus = document.querySelector('.resize__control--minus');
+  var resizeControlPlus = document.querySelector('.resize__control--plus');
+
 
   /**
    * создает обект с данными об эффекте
@@ -77,7 +84,8 @@
   }
 
   /**
-   * устанавливает в инпут значение, обновляет ползунок, регулирует насыщенность эффекта
+   * устанавливает в инпут значение от текущей ширины,
+   * обновляет ползунок, обновляет насыщенность эффекта
    *
    *  @param {Object} effect - объект с данными об эффекте
    */
@@ -95,9 +103,9 @@
   function onEffectsTogglerClick(evt) {
     var toggler = evt.target.closest('.effects__label');
     if (toggler) {
-      currentEffect = toggler.getAttribute('for');
-
       removeEffects(previewPhoto);
+      resizePhoto(inputResize.value.slice(0, -1));
+      currentEffect = toggler.getAttribute('for');
       if (currentEffect === 'effect-none') {
         scaleEffect.classList.add('hidden');
         return;
@@ -107,13 +115,61 @@
       }
       maxWidthEffectLine = lineScaleEffect.offsetWidth;
       previewPhoto.classList.add(effects[currentEffect].class);
-      inputEffectLevel.value = defaultInputValue;
+      inputEffectLevel.value = defaultInputEffectValue;
       updateScaleLevelEffect();
       previewPhoto.style.filter = effects[currentEffect].getFilter(inputEffectLevel.value);
     }
   }
 
-  //  ограничение по оси Х
+  /**
+   * применяет стили scale к фото, от значения инпута
+   * @param  {number} scaleValue число значения ипнута
+   */
+  function resizePhoto(scaleValue) {
+    previewPhoto.style.transform = 'scale(' + (scaleValue / MAX_PERCENT) + ')';
+  }
+
+  /**
+   * увеличивает значение инпута на нужный шаг
+   */
+  function onResizeControlsPlusClick() {
+    var inputValue = inputResize.value.slice(0, -1);
+    inputValue = Number(inputValue) + resizeStep;
+    if (inputValue > MAX_RESIZE_VALUE) {
+      inputValue = MAX_RESIZE_VALUE;
+    }
+    resizePhoto(inputValue);
+    inputResize.value = inputValue + '%';
+  }
+
+  /**
+   * уменьшает значение инпута на нужный шаг
+   */
+  function onResizeControlsMinusClick() {
+    var inputValue = inputResize.value.slice(0, -1);
+    inputValue = Number(inputValue) - resizeStep;
+    if (inputValue < MIN_RESIZE_VALUE) {
+      inputValue = MIN_RESIZE_VALUE;
+    }
+    resizePhoto(inputValue);
+    inputResize.value = inputValue + '%';
+  }
+
+  /**
+   * сбрасывает эффекты после сброса значений инпутов
+   */
+  function returnEffectToDefault() {
+    removeEffects(previewPhoto);
+    updateScaleLevelEffect();
+  }
+
+  /**
+   * ограничение по оси Х
+   * @param {number} Xcoord координата X
+   * @param {number} XMin
+   * @param {number} XMax
+   * @return {number} координата X не больше и не меньше установленных значений
+   */
   function setLimitsX(Xcoord, XMin, XMax) {
     if (Xcoord < XMin) {
       Xcoord = XMin;
@@ -124,6 +180,10 @@
     return Xcoord;
   }
 
+  /**
+   * запускает передвижение пина по шкале
+   * @param  {object} evtDown
+   */
   function onPinMouseDown(evtDown) {
     evtDown.preventDefault();
     var control = evtDown.target;
@@ -135,13 +195,10 @@
       var newX = Math.round((control.offsetLeft - shiftX) / maxWidthEffectLine * MAX_PERCENT); // новое значение x в процентах
 
       sartCoordsX = moveEvt.clientX; // новое значение Х мыши
-
       newX = setLimitsX(newX, MIN_COORDS_X, MAX_COORDS_X);
       control.style.left = newX + '%';
       levelScaleEffect.style.width = newX + '%';
-
       updateEffect(effects[currentEffect]);
-
     }
 
     function onMouseUp(upEvt) {
@@ -155,9 +212,16 @@
     document.addEventListener('mouseup', onMouseUp);
   }
 
+  resizeControlMinus.addEventListener('click', onResizeControlsMinusClick);
+  resizeControlPlus.addEventListener('click', onResizeControlsPlusClick);
+
   pinScaleEffect.addEventListener('mousedown', onPinMouseDown);
 
   effectsTogglers.forEach(function (toggler) {
     toggler.addEventListener('click', onEffectsTogglerClick);
   });
+
+  window.photoEffects = {
+    returnEffectToDefault: returnEffectToDefault,
+  };
 })();
