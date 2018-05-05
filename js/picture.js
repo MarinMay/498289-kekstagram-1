@@ -43,7 +43,7 @@
     return 'photos/' + photoNumber + '.jpg';
   }
 
-  // сортирует массив в случайном порядке
+  // сортирует массив в случайном порядке Сортировка Фишера-Йетса
   function sortArray(array) {
     var resultIndex = array.length;
     var currentIndex;
@@ -75,7 +75,7 @@
   function DataObject(photoNumber) {
     this.url = getPictureUrl(photoNumber);
     this.likes = getRandomNumber(15, 200);
-    this.comments = getComment(COMMENTS_DATA, this.comentsCount);
+    this.comments = getComment(COMMENTS_DATA);
     this.description = getDescription(DESCRIPTION_DATA);
   }
 
@@ -121,6 +121,14 @@
     }
   }
 
+  getDataObject();
+
+  addFragment();
+
+  // -------------------- создание обработчиков для вывода большой фотографии
+  var ESC_KEYCODE = 27;
+  var buttonCloseBigPicture = document.querySelector('.big-picture__cancel');
+
   //  выводит оверлей с большой фототграфией
   function showBigPicture(data) {
     bigPicturesImage.src = data.url;
@@ -131,15 +139,6 @@
     bigPicturesCommentsCountWrapper.classList.add('visually-hidden');
     bigPicturesCommentsLoad.classList.add('visually-hidden');
   }
-
-
-  getDataObject();
-
-  addFragment();
-
-  // -------------------- создание обработчиков для вывода большой фотографии
-  var ESC_KEYCODE = 27;
-  var buttonCloseBigPicture = document.querySelector('.big-picture__cancel');
 
   // закрытие большого фото по ESC
   function onBigPicturePressEsc(evt) {
@@ -175,11 +174,13 @@
 
   picturesContainer.addEventListener('click', onPhotosClick);
 
-  // --------------------загрузка фото----------------
+  // --------------------показывает окно редактирования фото----------------
 
   var inputUploadFile = document.querySelector('#upload-file');
   var uploadOverlay = document.querySelector('.img-upload__overlay');
   var buttonCloseUploadPhoto = document.querySelector('.img-upload__cancel');
+  var inputHashtag = document.querySelector('.text__hashtags');
+  var textarea = document.querySelector('.text__description');
 
   function onUploadOverlayPressEsc(evt) {
     if (evt.keyCode === ESC_KEYCODE) {
@@ -187,14 +188,14 @@
     }
   }
 
-  function onbuttonCloseUploadPhotoClick() {
+  function onButtonCloseUploadPhotoClick() {
     closeUploadOverlay();
   }
 
   function onInputPhotoUpload() {
     uploadOverlay.classList.remove('hidden');
     window.addEventListener('keydown', onUploadOverlayPressEsc);
-    buttonCloseUploadPhoto.addEventListener('click', onbuttonCloseUploadPhotoClick);
+    buttonCloseUploadPhoto.addEventListener('click', onButtonCloseUploadPhotoClick);
     scaleEffect.classList.add('hidden');
   }
 
@@ -202,10 +203,22 @@
     uploadOverlay.classList.add('hidden');
     inputUploadFile.addEventListener('change', onInputPhotoUpload);
     window.removeEventListener('keydown', onUploadOverlayPressEsc);
-    buttonCloseUploadPhoto.removeEventListener('click', onbuttonCloseUploadPhotoClick);
+    buttonCloseUploadPhoto.removeEventListener('click', onButtonCloseUploadPhotoClick);
+  }
+
+  function onInputFocus() {
+    window.removeEventListener('keydown', onUploadOverlayPressEsc);
+  }
+
+  function onInputBlur() {
+    window.addEventListener('keydown', onUploadOverlayPressEsc);
   }
 
   inputUploadFile.addEventListener('change', onInputPhotoUpload);
+  inputHashtag.addEventListener('focus', onInputFocus);
+  inputHashtag.addEventListener('blur', onInputBlur);
+  textarea.addEventListener('focus', onInputFocus);
+  textarea.addEventListener('blur', onInputBlur);
 
   // ----------------------Эффекты фото----------
 
@@ -216,7 +229,19 @@
   var lineScaleEffect = document.querySelector('.scale__line');
   var pinScaleEffect = document.querySelector('.scale__pin');
   var levelScaleEffect = document.querySelector('.scale__level');
+  var maxWidthEffectLine = lineScaleEffect.offsetWidth;
 
+  /**
+   * создает обект с данными об эффекте
+   *
+   * @constructor
+   * @this {EffectsData}
+   * @param {string} className класс фильтра
+   * @param {string} filterName имя филтьра
+   * @param {number} filterMin минимальное значение филтьра
+   * @param {number} filterMax максимальное значение филтьра
+   * @param {string} filterPostfix еденица измерения фильра
+   */
   function EffectsData(className, filterName, filterMin, filterMax, filterPostfix) {
     this.class = className;
     this.filterName = filterName;
@@ -225,6 +250,13 @@
     this.filterPostfix = filterPostfix || '';
   }
 
+  /**
+   * создает обект с данными об эффекте
+   *
+   * @this {EffectsData}
+   * @param {number} inputValue значение инпута насыщенности эффекта
+   * @return {string} строка с готовым стилем для картинки
+   */
   EffectsData.prototype.getFilter = function (inputValue) {
     var filterValue = (this.filterMax - this.filterMin) / 100 * inputValue + this.filterMin;
     return this.filterName + '(' + filterValue + this.filterPostfix + ')';
@@ -238,6 +270,11 @@
     'effect-heat': new EffectsData('effects__preview--heat', 'brightness', 1, 3)
   };
 
+  /**
+   * удаляет все инлайновые стили, и оставляет кассы которые не начинаются с 'effects'
+   *
+   * @param {Object} photo - большое фото с превью эффекта
+  */
   function removeEffects(photo) {
     photo.removeAttribute('style');
     if (photo.className.indexOf('effects') > 0) {
@@ -248,11 +285,31 @@
     }
   }
 
+  /**
+   * регулирует ширину и положение ползунка от знаяения инпута
+   */
   function updateScaleLevelEffect() {
     levelScaleEffect.style.width = inputEffectLevel.value + '%';
     pinScaleEffect.style.left = inputEffectLevel.value + '%';
   }
 
+  /**
+   * устанавливает в инпут значение, обновляет ползунок, регулирует насыщенность эффекта
+   *
+   *  @param {Object} effect - объект с данными об эффекте
+   */
+  function onScalePinEffectMouseUp(effect) {
+    var currentWidth = levelScaleEffect.offsetWidth;
+    inputEffectLevel.value = Math.round(currentWidth / maxWidthEffectLine * 100);
+    updateScaleLevelEffect();
+    previewPhoto.style.filter = effect.getFilter(inputEffectLevel.value);
+  }
+
+  /**
+   * клик по лейблу с эффектом переключает эффект
+   *
+   * @param {Object} evt событие
+   */
   function onEffectsTogglerClick(evt) {
     var toggler = evt.target.closest('.effects__label');
     if (toggler) {
@@ -269,21 +326,11 @@
       previewPhoto.classList.add(effects[effect].class);
       inputEffectLevel.value = 70;
       updateScaleLevelEffect();
-
       pinScaleEffect.addEventListener('mouseup', function (upEvt) {
         onScalePinEffectMouseUp(effects[effect]);
         upEvt.preventDefault();
       });
     }
-  }
-
-  function onScalePinEffectMouseUp(effect) {
-    var maxWidth = lineScaleEffect.offsetWidth;
-    var currentWidth = levelScaleEffect.offsetWidth;
-    inputEffectLevel.value = Math.round(currentWidth / maxWidth * 100);
-    updateScaleLevelEffect();
-    previewPhoto.style.filter = effect.getFilter(inputEffectLevel.value);
-    console.log(effect.getFilter(inputEffectLevel.value));
   }
 
   effectsTogglers.forEach(function (toggler) {
