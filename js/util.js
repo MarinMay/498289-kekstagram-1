@@ -1,6 +1,8 @@
 'use strict';
 (function () {
   var ESC_KEYCODE = 27;
+  var DEBOUNCE_INTERVAL = 500; // ms
+  var lastTimeout;
 
   /**
    * получает случайное число от min до max
@@ -23,8 +25,20 @@
     }
   }
 
+  /**
+   * устранение 'дребзга' - вызывает callback не чаще заданного интервала
+   * @param  {Function} cb
+   */
+  function debounce(cb) {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+    }
+    lastTimeout = window.setTimeout(cb, DEBOUNCE_INTERVAL);
+  }
+
   window.util = {
     getRandomNumber: getRandomNumber,
-    onPressEcs: onPressEcs
+    onPressEcs: onPressEcs,
+    debounce: debounce
   };
 })();
