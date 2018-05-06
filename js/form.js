@@ -27,7 +27,6 @@
     }
     return true;
   }
-
   function showErrorImage() {
     imgError.classList.remove('hidden');
   }
