@@ -69,6 +69,5 @@
   }
 
   submitButton.addEventListener('click', onSubmitButtonClick);
-
   inputHashtag.addEventListener('input', clearCustomValidity);
 })();

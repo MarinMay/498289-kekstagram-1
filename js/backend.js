@@ -3,10 +3,10 @@
   var URL_SAVE = 'https://js.dump.academy/kekstagram';
   var URL_LOAD = 'https://js.dump.academy/kekstagram/data';
   var REQUEST_TIMEOUT = 10000;
-  var STATUS_CODE = {
-    ok: 200,
-    badRequest: 400,
-    notFound: 404
+  var StatusCode = {
+    OK: 200,
+    BAD_REQUEST: 400,
+    NOT_FOUND: 404
   };
 
   /**
@@ -29,13 +29,13 @@
     xhr.addEventListener('load', function () {
       var error;
       switch (xhr.status) {
-        case STATUS_CODE.ok:
+        case StatusCode.OK:
           onSuccess(xhr.response);
           break;
-        case STATUS_CODE.badRequest:
+        case StatusCode.BAD_REQUEST:
           error = 'Неверный запрос';
           break;
-        case STATUS_CODE.notFound:
+        case StatusCode.NOT_FOUND:
           error = 'Ничего не найдено';
           break;
         default:
@@ -73,13 +73,13 @@
     xhr.addEventListener('load', function () {
       var error;
       switch (xhr.status) {
-        case STATUS_CODE.ok:
+        case StatusCode.OK:
           onSuccess(xhr.response);
           break;
-        case STATUS_CODE.badRequest:
+        case StatusCode.BAD_REQUEST:
           error = 'Неверный запрос';
           break;
-        case STATUS_CODE.notFound:
+        case StatusCode.NOT_FOUND:
           error = 'Ничего не найдено';
           break;
         default:

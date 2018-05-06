@@ -3,6 +3,10 @@
   var MIN_COORDS_X = 0;
   var MAX_COORDS_X = 100;
   var MAX_PERCENT = 100;
+  var MIN_RESIZE_VALUE = 25;
+  var MAX_RESIZE_VALUE = 100;
+  var RESIZE_STEP = 25;
+  var DEFAULT_INPUT_EFFECT_VALUE = 100;
   var effectsTogglers = document.querySelectorAll('.effects__label');
   var previewPhoto = document.querySelector('.img-upload__preview');
   var inputEffectLevel = document.querySelector('[name="effect-level"]');
@@ -12,14 +16,9 @@
   var levelScaleEffect = document.querySelector('.scale__level');
   var currentEffect = 'effect-none';
   var maxWidthEffectLine;
-  var defaultInputEffectValue = 100;
-  var resizeStep = 25;
-  var MIN_RESIZE_VALUE = 25;
-  var MAX_RESIZE_VALUE = 100;
   var inputResize = document.querySelector('.resize__control--value');
   var resizeControlMinus = document.querySelector('.resize__control--minus');
   var resizeControlPlus = document.querySelector('.resize__control--plus');
-
 
   /**
    * создает обект с данными об эффекте
@@ -115,7 +114,7 @@
       }
       maxWidthEffectLine = lineScaleEffect.offsetWidth;
       previewPhoto.classList.add(effects[currentEffect].class);
-      inputEffectLevel.value = defaultInputEffectValue;
+      inputEffectLevel.value = DEFAULT_INPUT_EFFECT_VALUE;
       updateScaleLevelEffect();
       previewPhoto.style.filter = effects[currentEffect].getFilter(inputEffectLevel.value);
     }
@@ -134,7 +133,7 @@
    */
   function onResizeControlsPlusClick() {
     var inputValue = inputResize.value.slice(0, -1);
-    inputValue = Number(inputValue) + resizeStep;
+    inputValue = Number(inputValue) + RESIZE_STEP;
     if (inputValue > MAX_RESIZE_VALUE) {
       inputValue = MAX_RESIZE_VALUE;
     }
@@ -147,7 +146,7 @@
    */
   function onResizeControlsMinusClick() {
     var inputValue = inputResize.value.slice(0, -1);
-    inputValue = Number(inputValue) - resizeStep;
+    inputValue = Number(inputValue) - RESIZE_STEP;
     if (inputValue < MIN_RESIZE_VALUE) {
       inputValue = MIN_RESIZE_VALUE;
     }
