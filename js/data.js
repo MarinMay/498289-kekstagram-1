@@ -45,9 +45,9 @@
   function reloadPhotoLink(sorteredPhoto) {
     var currentLinks = picturesContainer.querySelectorAll('.picture__link');
 
-    for (var i = 0; i < currentLinks.length; i++) {
-      picturesContainer.removeChild(currentLinks[i]);
-    }
+    currentLinks.forEach(function (link) {
+      picturesContainer.removeChild(link);
+    });
     addFragment(sorteredPhoto);
   }
 
@@ -55,14 +55,14 @@
    * Добавляет данные на страницу, вызывается после загрузки данных
    * @param  {Object} data Объект, получаемый по запросу с сервера
    */
-  function onDataload(data) {
+  function onDataLoad(data) {
     dataPhotos = data;
     addFragment(dataPhotos);
     window.data.dataPhotos = dataPhotos;
     filters.classList.remove('img-filters--inactive');
   }
 
-  window.backend.requestLoadData(onDataload, window.backend.onRequestError);
+  window.backend.requestLoadData(onDataLoad, window.backend.onRequestError);
 
   window.data = {
     reloadPhotoLink: reloadPhotoLink

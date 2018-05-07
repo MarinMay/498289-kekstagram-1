@@ -7,18 +7,19 @@
   var MAX_RESIZE_VALUE = 100;
   var RESIZE_STEP = 25;
   var DEFAULT_INPUT_EFFECT_VALUE = 100;
-  var effectsTogglers = document.querySelectorAll('.effects__label');
-  var previewPhoto = document.querySelector('.img-upload__preview');
-  var inputEffectLevel = document.querySelector('[name="effect-level"]');
-  var scaleEffect = document.querySelector('.scale');
-  var lineScaleEffect = document.querySelector('.scale__line');
-  var pinScaleEffect = document.querySelector('.scale__pin');
-  var levelScaleEffect = document.querySelector('.scale__level');
+  var imgUpload = document.querySelector('.img-upload');
+  var effectsTogglers = imgUpload.querySelectorAll('.effects__label');
+  var previewPhoto = imgUpload.querySelector('.img-upload__preview');
+  var inputEffectLevel = imgUpload.querySelector('[name="effect-level"]');
+  var scaleEffect = imgUpload.querySelector('.scale');
+  var lineScaleEffect = imgUpload.querySelector('.scale__line');
+  var pinScaleEffect = imgUpload.querySelector('.scale__pin');
+  var levelScaleEffect = imgUpload.querySelector('.scale__level');
+  var inputResize = imgUpload.querySelector('.resize__control--value');
+  var resizeControlMinus = imgUpload.querySelector('.resize__control--minus');
+  var resizeControlPlus = imgUpload.querySelector('.resize__control--plus');
   var currentEffect = 'effect-none';
   var maxWidthEffectLine;
-  var inputResize = document.querySelector('.resize__control--value');
-  var resizeControlMinus = document.querySelector('.resize__control--minus');
-  var resizeControlPlus = document.querySelector('.resize__control--plus');
 
   /**
    * создает обект с данными об эффекте
@@ -164,19 +165,19 @@
 
   /**
    * ограничение по оси Х
-   * @param {number} Xcoord координата X
+   * @param {number} xCoord координата X
    * @param {number} XMin
    * @param {number} XMax
    * @return {number} координата X не больше и не меньше установленных значений
    */
-  function setLimitsX(Xcoord, XMin, XMax) {
-    if (Xcoord < XMin) {
-      Xcoord = XMin;
+  function setLimitsX(xCoord, XMin, XMax) {
+    if (xCoord < XMin) {
+      xCoord = XMin;
     }
-    if (Xcoord > XMax) {
-      Xcoord = XMax;
+    if (xCoord > XMax) {
+      xCoord = XMax;
     }
-    return Xcoord;
+    return xCoord;
   }
 
   /**

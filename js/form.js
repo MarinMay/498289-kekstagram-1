@@ -1,10 +1,17 @@
 'use strict';
 (function () {
-  var MAX_COUNT_HASHTAG = 5;
   var inputHashtag = document.querySelector('.text__hashtags');
   var submitButton = document.querySelector('#upload-submit');
   var form = document.querySelector('.img-upload__form');
   var imgError = document.querySelector('.img-upload__message--error');
+
+  var Hashtags = {
+    SHARP_POSITION: 0,
+    START_SHARP_POSITION_NOT_VALID: 1,
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 20,
+    MAX_COUNT: 5
+  };
 
   /**
    * Проверяет один хэштег на ограничения
@@ -12,16 +19,17 @@
    * @return {boolean} возращает true или false
    */
   function validateHashtag(hashtag) {
-    if (hashtag[0] !== '#') {
+    if (hashtag[Hashtags.SHARP_POSITION] !== '#') {
       inputHashtag.setCustomValidity('Хэштег должен начинатья с решетки');
       return false;
-    } else if (hashtag.length === 1) {
+    } else if (hashtag.length < Hashtags.MIN_LENGTH) {
       inputHashtag.setCustomValidity('Хэштег должен содержать значение кроме решетки');
       return false;
-    } else if (hashtag.length > 20) {
-      inputHashtag.setCustomValidity('Хэштег может быть длиной не более 20 символов');
+    } else if (hashtag.length > Hashtags.MAX_LENGTH) {
+      inputHashtag.setCustomValidity('Хэштег может быть длиной не более' +
+        Hashtags.MAX_LENGTH + 'символов');
       return false;
-    } else if (hashtag.indexOf('#', 1) > 0) {
+    } else if (hashtag.indexOf('#', Hashtags.START_SHARP_POSITION_NOT_VALID) > 0) {
       inputHashtag.setCustomValidity('Хэштег должен разделяться пробелом');
       return false;
     }
@@ -43,13 +51,14 @@
         if (!isHashtagValid) {
           break;
         }
-        if (hashtagArray.indexOf(hashtagArray[i], i + 1) > 0) {
+        var positionNextHashtag = i + 1;
+        if (hashtagArray.indexOf(hashtagArray[i], positionNextHashtag) > 0) {
           inputHashtag.setCustomValidity('Хэштеги не должны повторяться');
           break;
         }
       }
-      if (hashtagArray.length > MAX_COUNT_HASHTAG) {
-        inputHashtag.setCustomValidity('Хэштегов может быть максимум 5');
+      if (hashtagArray.length > Hashtags.MAX_COUNT) {
+        inputHashtag.setCustomValidity('Хэштегов может быть максимум ' + Hashtags.MAX_COUNT);
       }
     }
 
@@ -63,10 +72,10 @@
   /**
    * Очищает кастомное сообщение об ошибке
    */
-  function clearCustomValidity() {
+  function onInputInput() {
     inputHashtag.setCustomValidity('');
   }
 
   submitButton.addEventListener('click', onSubmitButtonClick);
-  inputHashtag.addEventListener('input', clearCustomValidity);
+  inputHashtag.addEventListener('input', onInputInput);
 })();
